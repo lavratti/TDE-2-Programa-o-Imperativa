@@ -29,7 +29,7 @@
 #define DIST_RETA_PLANO 4
 #define DIST_PONTO_PLANO 5
 
-//Para evitar alocaÃ§Ã£o dinamica em lugares que nÃ£o faz muita diferenÃ§a
+//Para evitar alocaÃƒÂ§ÃƒÂ£o dinamica em lugares que nÃƒÂ£o faz muita diferenÃƒÂ§a
 
 #define MAGIA_NEGRA 32
 
@@ -62,11 +62,11 @@ int novaEntrada(int argc, float *argv) {
 
     fLog = fopen("historico.log", "a+t");
 
-    if(fLog == NULL)	/* NÃÂ£o foi possivel ler ou o arquivo nÃÂ£o existe */
+    if(fLog == NULL)	/* NÃƒÂƒÃ‚Â£o foi possivel ler ou o arquivo nÃƒÂƒÃ‚Â£o existe */
         fLog = fopen("historico.log", "w+t"); //Linha desnecessaria pois o modo a+t cria o arquivo se ele nao existir
 
     if(fLog == NULL)
-        return 0; // NÃÂ£o foi possÃÂ­vel criar o arquivo
+        return 0; // NÃƒÂƒÃ‚Â£o foi possÃƒÂƒÃ‚Â­vel criar o arquivo
 
     fprintf(fLog, "%ld;",time(NULL));
     fprintf(fLog, "%d;",argc);
@@ -84,16 +84,16 @@ int novaEntrada(int argc, float *argv) {
 }
 
 int Remove_Log() { 
-
-    fLog = fopen("historico.log", "r+t");
-    
-    /* Se nao foi possivel ler o arquivo e/ou renomear */
-    
-    if((rename("historico.log", "historico.log.old") != 0) || fLog == NULL)
-        return 0;
-    /* Se foi possivel ler e renomear */
+	char ch;
+	FILE *fLogOld;
+    if((fLog = fopen("historico.log", "r+t")) == NULL || (fLogOld = fopen("historico.log.old", "a+t")) == NULL)
+    	return 0;
     else
-        return 1; 
+    	while((ch = fgetc(fLog)) != EOF)
+    		fputc(ch, fLogOld);
+	fclose(fLog);
+	fclose(fLogOld);
+    return 1;
 }
 
 int mostraLog() {
@@ -405,7 +405,7 @@ void menuDistancias() {
 
         printf("Digite as coordenadas (x, y, z) do vetor diretor do plano e o termo 'd': ");
 
-        scanf("%f%f%f%f", &x[0], &y[0], &z[0], &d);
+        scanf("%f%f%f%f", &x[0], &y[0], &z[0], d);
 
         preLog[2] = *x;
         preLog[3] = *y;
@@ -430,7 +430,7 @@ void menuDistancias() {
 
         printf("Digite as coordenadas (x, y, z) do vetor diretor do plano e o termo 'd': ");
 
-        scanf("%f%f%f%f", &x[0], &y[0], &z[0], &d);
+        scanf("%f%f%f%f", &x[0], &y[0], &z[0], d);
 
         preLog[2] = *x;
         preLog[3] = *y;
