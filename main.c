@@ -17,6 +17,7 @@
 #define PRODUTOS 1
 #define DISTANCIAS 2
 #define MOSTRA_LOG 3
+#define REMOVE_LOG 4
 
 #define PRODUTO_ESCALAR 1
 #define PRODUTO_VETORIAL 2
@@ -28,7 +29,8 @@
 #define DIST_RETA_PLANO 4
 #define DIST_PONTO_PLANO 5
 
-//Para evitar aloca��o dinamica em lugares que n�o faz muita diferen�a
+//Para evitar alocaÃ§Ã£o dinamica em lugares que nÃ£o faz muita diferenÃ§a
+
 #define MAGIA_NEGRA 32
 
 FILE *fLog;
@@ -42,12 +44,14 @@ FILE *fLog;
 void clean_stdin(void) {
     fflush(stdin);
     /* UNCOMMENT IF LINUX
+
     int c;
 
     do {
         c = getchar();
     } while (c != '\n' && c != EOF);
     /**/
+
 }
 
 float preLog[MAGIA_NEGRA];
@@ -58,11 +62,11 @@ int novaEntrada(int argc, float *argv) {
 
     fLog = fopen("historico.log", "a+t");
 
-    if(fLog == NULL)	/* Não foi possivel ler ou o arquivo não existe */
-        fLog = fopen("historico.log", "w+t");
+    if(fLog == NULL)	/* NÃÂ£o foi possivel ler ou o arquivo nÃÂ£o existe */
+        fLog = fopen("historico.log", "w+t"); //Linha desnecessaria pois o modo a+t cria o arquivo se ele nao existir
 
     if(fLog == NULL)
-        return 0; // Não foi possível criar o arquivo
+        return 0; // NÃÂ£o foi possÃÂ­vel criar o arquivo
 
     fprintf(fLog, "%ld;",time(NULL));
     fprintf(fLog, "%d;",argc);
@@ -72,18 +76,25 @@ int novaEntrada(int argc, float *argv) {
         //printf(" LOG> %f \n",*(argv+i));
     }
     fprintf(fLog, "\n");
-    fflush(fLog);
+    fflush(fLog); /* Talvez nao seja necessario pois o fclose alem de fechar tambem grava em disco os dados */
     fclose(fLog);
     printf("\n <LOG OK> \n");
     return 1;
 
 }
 
-/* TODO
-int Remove_Log() {
-}
-/**/
+int Remove_Log() { 
 
+    fLog = fopen("historico.log", "r+t");
+    
+    /* Se nao foi possivel ler o arquivo e/ou renomear */
+    
+    if((rename("historico.log", "historico.log.old") != 0) || fLog == NULL)
+        return 0;
+    /* Se foi possivel ler e renomear */
+    else
+        return 1; 
+}
 
 int mostraLog() {
 
@@ -393,7 +404,9 @@ void menuDistancias() {
         preLog[1] = DIST_RETA_PLANO;
 
         printf("Digite as coordenadas (x, y, z) do vetor diretor do plano e o termo 'd': ");
+
         scanf("%f%f%f%f", &x[0], &y[0], &z[0], &d);
+
         preLog[2] = *x;
         preLog[3] = *y;
         preLog[4] = *z;
@@ -416,7 +429,9 @@ void menuDistancias() {
         preLog[1] = DIST_PONTO_PLANO;
 
         printf("Digite as coordenadas (x, y, z) do vetor diretor do plano e o termo 'd': ");
+
         scanf("%f%f%f%f", &x[0], &y[0], &z[0], &d);
+
         preLog[2] = *x;
         preLog[3] = *y;
         preLog[4] = *z;
@@ -447,9 +462,14 @@ int main(int argc, char *argv[]) {
         printf("1 - \t Produtos entre vetores\n"
                "2 - \t Distancias\n"
                "3 - \t Mostrar log\n"
+               "4 - \t Remover log\n"
                "Outro -  Sair do programa\n"
                "Digite o numero correspondente a opcao desejada: ");
-        clean_stdin();
+
+        /*clean_stdin() reposicionado pro fim do loop
+         * estava bugando a primeira execucao
+         * pedindo 2x entrada do usuario
+         */
         switch (getchar()-48) {
 
         case PRODUTOS:
@@ -465,6 +485,10 @@ int main(int argc, char *argv[]) {
         case MOSTRA_LOG:
             mostraLog();
             break;
+
+        case REMOVE_LOG:
+            Remove_Log();
+            break;
         }
 
         printf("Deseja continuar? (1 - Sim) (Outro - Nao)\n");
@@ -472,10 +496,11 @@ int main(int argc, char *argv[]) {
         if (getchar() != '1')
             return 0;
 
+        clean_stdin();
         printf("Retornando ao meu principal... \n");
-        system("pause");
-        system("cls");
-
+        //system("pause"); /* SUGESTAO: Substituir por getchar(), pois nao funciona no linux */
+        system("clear || cls");  /* Para 'limpar' a tela tanto no linux quanto no windows*/
+        
 
     }
 
